@@ -1,0 +1,20 @@
+BRANDS = {
+    "Samsung": "samsung",
+    "Google": "goolge",
+    "Lenovo": "lenovo",
+    "Apple": "apple",
+    "LG": "LG",
+    "Huawei": "huawei",
+    "Blu": "blu",
+    "Motorola": "motorola",
+    "Microsoft": "microsoft",
+    "OnePlus": "oneplus",
+    "Xiaomi": "xiaomi",
+    "Nokia": "nokia",
+    "Blackberry": "blackberry",
+    "Sony": "sony",
+    "iPhone": "apple",
+    "Iphone": "apple",
+    "Kyocera": "kyocera",
+    "Siemens": "siemens"
+}
