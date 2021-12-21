@@ -3,20 +3,20 @@ import scrapy
 class EbayWebSpider(scrapy.Spider):
     name = "ebay"
     domain = ["ebay.com"]
-    start_urls = ["https://www.ebay.com/sch/i.html?_from=R40&_trksid=m570.l1313&_nkw=computers&_sacat=0&LH_TitleDesc=0&_oac=1"]
+    start_urls = ["https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2380057.m570.l1311&_nkw=smartphone&_sacat=0"]
 
     def parse(self, response):
         products = response.xpath('//div/div/ul/li[contains(@class, "s-item" )]')
-        for product in products:            
+        for product in products:
             name = product.xpath('.//*[@class="s-item__title"]//text()').get()
+            # treat new listing to avoid errors
             if name == 'New Listing':
                 name = product.xpath('.//*[@class="s-item__title"]//text()').extract()[1]
-            
             price = product.xpath('.//*[@class="s-item__price"]//text()').get().replace('$','')
             geo = product.xpath('.//*[@class="s-item__location s-item__itemLocation"]//text()').get().replace('from ','')
             condition_items = product.xpath('.//*[@class="s-item__subtitle"]//text()').get()
             product_url = product.xpath('.//a[@class="s-item__link"]/@href').get()
-
+            # treating conditions for when > 1
             try:
                 if len(condition_items) == 1:
                     condition = product.xpath('.//*[@class="s-item__subtitle"]//text()').get()
@@ -25,7 +25,7 @@ class EbayWebSpider(scrapy.Spider):
             except Exception as e:
                 print(f"product condition not found - due to {e}")
                 condition = 'not found'
-
+            # return all collected html data
             yield {
                 'product_name': name,
                 'price': price,
@@ -33,12 +33,9 @@ class EbayWebSpider(scrapy.Spider):
                 'condition': condition,
                 'url': product_url
             }
-
-        """adding code for going into next urls"""
-        
-        # next_page = response.xpath('//*/a[@class="x-pagination__control"][2]/@href').extract_first()
-
-        # if next_page == None or str(next_page).endswith('#'):
-        #     self.log("products collected successfully")
-        # else:
-        #     yield scrapy.Request(next_page, callback=self.parse)
+        # get button for url next page
+        next_page = response.css('a.pagination__next.icon-link').attrib['href']
+        print(f'this is the next page: {next_page}')
+        # continue loop while url appears
+        if next_page is not None:
+            yield scrapy.Request(next_page, callback=self.parse)
